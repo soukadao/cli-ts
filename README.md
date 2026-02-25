@@ -61,3 +61,9 @@ cli.run();
 - `OptionDefinition`: defines option name, type, short flag, defaults, and choices.
 - `ArgumentDefinition`: defines positional arguments, including optional or variadic.
 - `CommandContext`: passed to actions with parsed `args`, `options`, and `rawArgs`.
+
+## Testing
+```sh
+pnpm test
+pnpm coverage
+```

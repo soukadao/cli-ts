@@ -20,8 +20,11 @@ var SHORT_NAME_LENGTH = 1;
 // src/option-utils.ts
 var buildLongFlag = (name) => `${LONG_PREFIX}${name}`;
 var buildShortFlag = (short) => `${SHORT_PREFIX}${short}`;
-var getOptionFlags = (option) => option.short ? [buildShortFlag(option.short), buildLongFlag(option.name)] : [buildLongFlag(option.name)];
-var getValueHint = (type) => type === "boolean" ? "" : ` <${type}>`;
+var getOptionFlags = (option) =>
+  option.short
+    ? [buildShortFlag(option.short), buildLongFlag(option.name)]
+    : [buildLongFlag(option.name)];
+var getValueHint = (type) => (type === "boolean" ? "" : ` <${type}>`);
 var formatOptionLabel = (option) => {
   const flags = getOptionFlags(option).join(", ");
   return `${flags}${getValueHint(option.type)}`;
@@ -48,7 +51,7 @@ var formatDescription = (definition) => {
   }
   if (definition.choices && definition.choices.length > EMPTY) {
     suffixes.push(
-      `choices: ${definition.choices.map((choice) => formatValue(choice)).join(", ")}`
+      `choices: ${definition.choices.map((choice) => formatValue(choice)).join(", ")}`,
     );
   }
   if (suffixes.length === EMPTY) {
@@ -81,11 +84,11 @@ var renderCommands = (commands) => {
   }
   const nameWidth = Math.max(
     ...commands.map((command) => command.name.length),
-    EMPTY
+    EMPTY,
   );
   for (const command of commands) {
     lines.push(
-      `${INDENT}${command.name.padEnd(nameWidth)}${" ".repeat(COLUMN_GAP)}${command.description}`
+      `${INDENT}${command.name.padEnd(nameWidth)}${" ".repeat(COLUMN_GAP)}${command.description}`,
     );
   }
   return lines;
@@ -94,12 +97,12 @@ var renderOptions = (title, options) => {
   const lines = ["", title];
   const labelWidth = Math.max(
     ...options.map((option) => formatOptionLabel(option).length),
-    EMPTY
+    EMPTY,
   );
   for (const option of options) {
     const label = formatOptionLabel(option);
     lines.push(
-      `${INDENT}${label.padEnd(labelWidth)}${" ".repeat(COLUMN_GAP)}${formatDescription(option)}`
+      `${INDENT}${label.padEnd(labelWidth)}${" ".repeat(COLUMN_GAP)}${formatDescription(option)}`,
     );
   }
   return lines;
@@ -113,7 +116,7 @@ var renderArguments = (args) => {
   const nameWidth = Math.max(...args.map((arg) => arg.name.length), EMPTY);
   for (const arg of args) {
     lines.push(
-      `${INDENT}${arg.name.padEnd(nameWidth)}${" ".repeat(COLUMN_GAP)}${formatDescription(arg)}`
+      `${INDENT}${arg.name.padEnd(nameWidth)}${" ".repeat(COLUMN_GAP)}${formatDescription(arg)}`,
     );
   }
   return lines;
@@ -127,8 +130,8 @@ var renderGlobalHelp = (context) => {
   lines.push(
     ...renderOptions("Options:", [
       context.globalOptions.help,
-      context.globalOptions.version
-    ])
+      context.globalOptions.version,
+    ]),
   );
   return lines.join("\n");
 };
@@ -140,10 +143,10 @@ var renderCommandHelp = (context, command) => {
   lines.push(...renderArguments(command.args ?? []));
   lines.push(
     ...renderOptions("Options:", [
-      ...command.options ?? [],
+      ...(command.options ?? []),
       context.globalOptions.help,
-      context.globalOptions.version
-    ])
+      context.globalOptions.version,
+    ]),
   );
   return lines.join("\n");
 };
@@ -162,9 +165,8 @@ var levenshteinDistance = (source, target) => {
   if (targetLength === 0) {
     return sourceLength;
   }
-  const matrix = Array.from(
-    { length: sourceLength + 1 },
-    () => Array.from({ length: targetLength + 1 }, () => 0)
+  const matrix = Array.from({ length: sourceLength + 1 }, () =>
+    Array.from({ length: targetLength + 1 }, () => 0),
   );
   for (let i = 0; i <= sourceLength; i += 1) {
     matrix[i][0] = i;
@@ -178,7 +180,7 @@ var levenshteinDistance = (source, target) => {
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1,
         matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + substitutionCost
+        matrix[i - 1][j - 1] + substitutionCost,
       );
     }
   }
@@ -192,7 +194,7 @@ var findClosest = (value, candidates) => {
   for (const candidate of candidates) {
     const distance = levenshteinDistance(
       normalizeCandidate(candidate),
-      normalized
+      normalized,
     );
     if (distance < bestDistance) {
       bestDistance = distance;
@@ -215,12 +217,12 @@ var splitOnEquals = (token) => {
   }
   return {
     head: token.slice(EMPTY, index),
-    value: token.slice(index + SINGLE_CHAR_LENGTH)
+    value: token.slice(index + SINGLE_CHAR_LENGTH),
   };
 };
 var createError = (kind, message) => ({
   kind,
-  message
+  message,
 });
 var getTypeLabel = (type) => type;
 var formatValue2 = (value) => {
@@ -306,16 +308,16 @@ var parseOptionValue = (option, raw, label) => {
     return {
       error: createError(
         "InvalidOptionValue",
-        `Invalid value for option: ${label} (expected ${getTypeLabel(option.type)})`
-      )
+        `Invalid value for option: ${label} (expected ${getTypeLabel(option.type)})`,
+      ),
     };
   }
   if (!applyChoices(parsed.value, option)) {
     return {
       error: createError(
         "InvalidOptionValue",
-        `Invalid value for option: ${label}${normalizeChoices(option.choices)}`
-      )
+        `Invalid value for option: ${label}${normalizeChoices(option.choices)}`,
+      ),
     };
   }
   return { value: parsed.value };
@@ -326,16 +328,16 @@ var parseArgumentValue = (argument, raw) => {
     return {
       error: createError(
         "InvalidArgumentValue",
-        `Invalid value for argument: ${argument.name} (expected ${getTypeLabel(argument.type)})`
-      )
+        `Invalid value for argument: ${argument.name} (expected ${getTypeLabel(argument.type)})`,
+      ),
     };
   }
   if (!applyChoices(parsed.value, argument)) {
     return {
       error: createError(
         "InvalidArgumentValue",
-        `Invalid value for argument: ${argument.name}${normalizeChoices(argument.choices)}`
-      )
+        `Invalid value for argument: ${argument.name}${normalizeChoices(argument.choices)}`,
+      ),
     };
   }
   return { value: parsed.value };
@@ -344,12 +346,12 @@ var parseArguments = (positionals, argumentsDefinition) => {
   const args = {};
   const errors = [];
   const variadicIndex = argumentsDefinition.findIndex(
-    (definition) => definition.variadic === true
+    (definition) => definition.variadic === true,
   );
   if (variadicIndex === -1 && positionals.length > argumentsDefinition.length) {
     const extras = positionals.slice(argumentsDefinition.length).join(", ");
     errors.push(
-      createError("TooManyArguments", `Too many arguments: ${extras}`)
+      createError("TooManyArguments", `Too many arguments: ${extras}`),
     );
   }
   for (let index = 0; index < argumentsDefinition.length; index += 1) {
@@ -364,12 +366,15 @@ var parseArguments = (positionals, argumentsDefinition) => {
         errors.push(
           createError(
             "MissingRequiredArgument",
-            `Missing required argument: ${definition.name}`
-          )
+            `Missing required argument: ${definition.name}`,
+          ),
         );
       }
       for (const raw2 of rest) {
-        const { value: value2, error: error2 } = parseArgumentValue(definition, raw2);
+        const { value: value2, error: error2 } = parseArgumentValue(
+          definition,
+          raw2,
+        );
         if (error2) {
           errors.push(error2);
         } else {
@@ -385,8 +390,8 @@ var parseArguments = (positionals, argumentsDefinition) => {
         errors.push(
           createError(
             "MissingRequiredArgument",
-            `Missing required argument: ${definition.name}`
-          )
+            `Missing required argument: ${definition.name}`,
+          ),
         );
       } else if (hasOwn2(definition, "default")) {
         args[definition.name] = definition.default;
@@ -404,7 +409,14 @@ var parseArguments = (positionals, argumentsDefinition) => {
   }
   return { args, errors };
 };
-var registerOptionValue = (option, raw, label, values, errors, presentOptions) => {
+var registerOptionValue = (
+  option,
+  raw,
+  label,
+  values,
+  errors,
+  presentOptions,
+) => {
   const parsed = parseOptionValue(option, raw, label);
   if (parsed.error) {
     errors.push(parsed.error);
@@ -441,19 +453,23 @@ var parseCommandInput = (argv, command) => {
       index += 1;
       continue;
     }
-    if (allowOptions && token.startsWith(LONG_PREFIX) && token.length > LONG_PREFIX.length) {
+    if (
+      allowOptions &&
+      token.startsWith(LONG_PREFIX) &&
+      token.length > LONG_PREFIX.length
+    ) {
       const { head, value } = splitOnEquals(token);
       const longName = head.slice(LONG_PREFIX.length);
       const option = longOptions.get(longName);
       if (!option) {
-        const candidates = optionDefinitions.map(
-          (definition) => buildLongFlag(definition.name)
+        const candidates = optionDefinitions.map((definition) =>
+          buildLongFlag(definition.name),
         );
         errors.push(
           createError(
             "UnknownOption",
-            buildUnknownOptionMessage(token, candidates)
-          )
+            buildUnknownOptionMessage(token, candidates),
+          ),
         );
         index += 1;
         continue;
@@ -470,7 +486,7 @@ var parseCommandInput = (argv, command) => {
             label,
             values,
             errors,
-            presentOptions
+            presentOptions,
           );
         }
         index += 1;
@@ -478,12 +494,16 @@ var parseCommandInput = (argv, command) => {
       }
       if (value === void 0) {
         const next = argv[index + 1];
-        if (next === void 0 || next === OPTION_TERMINATOR || isKnownOptionToken(next, longOptions, shortOptions)) {
+        if (
+          next === void 0 ||
+          next === OPTION_TERMINATOR ||
+          isKnownOptionToken(next, longOptions, shortOptions)
+        ) {
           errors.push(
             createError(
               "MissingOptionValue",
-              `Missing value for option: ${label}`
-            )
+              `Missing value for option: ${label}`,
+            ),
           );
           index += 1;
           continue;
@@ -494,7 +514,7 @@ var parseCommandInput = (argv, command) => {
           label,
           values,
           errors,
-          presentOptions
+          presentOptions,
         );
         index += 2;
         continue;
@@ -503,7 +523,11 @@ var parseCommandInput = (argv, command) => {
       index += 1;
       continue;
     }
-    if (allowOptions && token.startsWith(SHORT_PREFIX) && token.length > SHORT_PREFIX.length) {
+    if (
+      allowOptions &&
+      token.startsWith(SHORT_PREFIX) &&
+      token.length > SHORT_PREFIX.length
+    ) {
       const { head, value } = splitOnEquals(token);
       const shortBody = head.slice(SHORT_PREFIX.length);
       if (shortBody.length > SINGLE_CHAR_LENGTH) {
@@ -511,8 +535,8 @@ var parseCommandInput = (argv, command) => {
           errors.push(
             createError(
               "InvalidOptionBundle",
-              `Invalid option bundle: ${token}`
-            )
+              `Invalid option bundle: ${token}`,
+            ),
           );
           index += 1;
           continue;
@@ -521,20 +545,22 @@ var parseCommandInput = (argv, command) => {
         for (const shortName of shortBody) {
           const option2 = shortOptions.get(shortName);
           if (!option2) {
-            const candidates = optionDefinitions.flatMap(
-              (definition) => definition.short ? [
-                buildShortFlag(definition.short),
-                buildLongFlag(definition.name)
-              ] : [buildLongFlag(definition.name)]
+            const candidates = optionDefinitions.flatMap((definition) =>
+              definition.short
+                ? [
+                    buildShortFlag(definition.short),
+                    buildLongFlag(definition.name),
+                  ]
+                : [buildLongFlag(definition.name)],
             );
             errors.push(
               createError(
                 "UnknownOption",
                 buildUnknownOptionMessage(
                   buildShortFlag(shortName),
-                  candidates
-                )
-              )
+                  candidates,
+                ),
+              ),
             );
             bundleError = true;
             break;
@@ -543,8 +569,8 @@ var parseCommandInput = (argv, command) => {
             errors.push(
               createError(
                 "InvalidOptionBundle",
-                `Invalid option bundle: ${token}`
-              )
+                `Invalid option bundle: ${token}`,
+              ),
             );
             bundleError = true;
             break;
@@ -561,14 +587,16 @@ var parseCommandInput = (argv, command) => {
       }
       const option = shortOptions.get(shortBody);
       if (!option) {
-        const candidates = optionDefinitions.flatMap(
-          (definition) => definition.short ? [buildShortFlag(definition.short), buildLongFlag(definition.name)] : [buildLongFlag(definition.name)]
+        const candidates = optionDefinitions.flatMap((definition) =>
+          definition.short
+            ? [buildShortFlag(definition.short), buildLongFlag(definition.name)]
+            : [buildLongFlag(definition.name)],
         );
         errors.push(
           createError(
             "UnknownOption",
-            buildUnknownOptionMessage(buildShortFlag(shortBody), candidates)
-          )
+            buildUnknownOptionMessage(buildShortFlag(shortBody), candidates),
+          ),
         );
         index += 1;
         continue;
@@ -582,12 +610,16 @@ var parseCommandInput = (argv, command) => {
       }
       if (value === void 0) {
         const next = argv[index + 1];
-        if (next === void 0 || next === OPTION_TERMINATOR || isKnownOptionToken(next, longOptions, shortOptions)) {
+        if (
+          next === void 0 ||
+          next === OPTION_TERMINATOR ||
+          isKnownOptionToken(next, longOptions, shortOptions)
+        ) {
           errors.push(
             createError(
               "MissingOptionValue",
-              `Missing value for option: ${label}`
-            )
+              `Missing value for option: ${label}`,
+            ),
           );
           index += 1;
           continue;
@@ -598,7 +630,7 @@ var parseCommandInput = (argv, command) => {
           label,
           values,
           errors,
-          presentOptions
+          presentOptions,
         );
         index += 2;
         continue;
@@ -615,14 +647,14 @@ var parseCommandInput = (argv, command) => {
       errors.push(
         createError(
           "MissingRequiredOption",
-          `Missing required option: ${buildLongFlag(option.name)}`
-        )
+          `Missing required option: ${buildLongFlag(option.name)}`,
+        ),
       );
     }
   }
   const { args, errors: argumentErrors } = parseArguments(
     positionals,
-    argumentDefinitions
+    argumentDefinitions,
   );
   errors.push(...argumentErrors);
   if (errors.length > EMPTY) {
@@ -667,11 +699,11 @@ var assertValidCommandDefinition = (command) => {
   options.forEach(assertOption);
   assertUnique(
     options.map((option) => option.name),
-    "option name"
+    "option name",
   );
   assertUnique(
     options.map((option) => option.short).filter((value) => value !== void 0),
-    "option short name"
+    "option short name",
   );
   const args = command.args ?? [];
   const variadicIndex = args.findIndex((arg) => arg.variadic === true);
@@ -703,24 +735,26 @@ var assertValidGlobalOptions = (options) => {
 
 // src/cli.ts
 var DEFAULT_IO = {
-  stdout: (text) => process.stdout.write(`${text}
+  stdout: (text) =>
+    process.stdout.write(`${text}
 `),
-  stderr: (text) => process.stderr.write(`${text}
-`)
+  stderr: (text) =>
+    process.stderr.write(`${text}
+`),
 };
 var DEFAULT_GLOBAL_OPTIONS = {
   help: {
     name: "help",
     short: "h",
     description: "Show help",
-    type: "boolean"
+    type: "boolean",
   },
   version: {
     name: "version",
     short: "v",
     description: "Show version",
-    type: "boolean"
-  }
+    type: "boolean",
+  },
 };
 var resolveGlobalOptions = (override) => {
   const resolved = {
@@ -728,14 +762,14 @@ var resolveGlobalOptions = (override) => {
       ...DEFAULT_GLOBAL_OPTIONS.help,
       ...override?.help,
       name: DEFAULT_GLOBAL_OPTIONS.help.name,
-      type: DEFAULT_GLOBAL_OPTIONS.help.type
+      type: DEFAULT_GLOBAL_OPTIONS.help.type,
     },
     version: {
       ...DEFAULT_GLOBAL_OPTIONS.version,
       ...override?.version,
       name: DEFAULT_GLOBAL_OPTIONS.version.name,
-      type: DEFAULT_GLOBAL_OPTIONS.version.type
-    }
+      type: DEFAULT_GLOBAL_OPTIONS.version.type,
+    },
   };
   assertValidGlobalOptions(resolved);
   return resolved;
@@ -764,7 +798,7 @@ var findCommandIndex = (argv) => {
 var buildCommandSuggestion = (name, commands) => {
   const candidate = findClosest(
     name,
-    commands.map((command) => command.name)
+    commands.map((command) => command.name),
   );
   if (!candidate) {
     return void 0;
@@ -776,7 +810,7 @@ var buildHelpContext = (cli, commands) => ({
   version: cli.version,
   description: cli.description,
   commands,
-  globalOptions: cli.options
+  globalOptions: cli.options,
 });
 var CLI = class {
   name;
@@ -814,7 +848,8 @@ var CLI = class {
     const versionRequested = argv.some((arg) => versionFlags.includes(arg));
     const commandIndex = findCommandIndex(argv);
     const commandName = commandIndex >= EMPTY ? argv[commandIndex] : void 0;
-    const commandArgs = commandIndex >= EMPTY ? argv.slice(commandIndex + 1) : [];
+    const commandArgs =
+      commandIndex >= EMPTY ? argv.slice(commandIndex + 1) : [];
     const sortedCommands = this.listCommands();
     const helpContext = buildHelpContext(this, sortedCommands);
     if (helpRequested) {
@@ -839,23 +874,27 @@ var CLI = class {
     const command = this.commands.get(commandName);
     if (!command) {
       const suggestion = buildCommandSuggestion(commandName, sortedCommands);
-      const message = suggestion ? `Unknown command: ${commandName}. ${suggestion}` : `Unknown command: ${commandName}.`;
+      const message = suggestion
+        ? `Unknown command: ${commandName}. ${suggestion}`
+        : `Unknown command: ${commandName}.`;
       io.stderr(message);
       return EXIT_FAILURE;
     }
     const parseResult = parseCommandInput(commandArgs, command);
     if (!parseResult.ok) {
-      const message = parseResult.errors.map((error) => error.message).join("\n");
+      const message = parseResult.errors
+        .map((error) => error.message)
+        .join("\n");
       io.stderr(message);
       io.stderr(
-        `Run ${this.name} ${command.name} ${buildLongFlag(this.options.help.name)} for usage.`
+        `Run ${this.name} ${command.name} ${buildLongFlag(this.options.help.name)} for usage.`,
       );
       return EXIT_FAILURE;
     }
     const context = {
       args: parseResult.args,
       options: parseResult.options,
-      rawArgs: commandArgs
+      rawArgs: commandArgs,
     };
     try {
       await command.action(context);
@@ -869,12 +908,10 @@ var CLI = class {
    * Returns registered commands in name order.
    */
   listCommands() {
-    return [...this.commands.values()].sort(
-      (left, right) => left.name.localeCompare(right.name)
+    return [...this.commands.values()].sort((left, right) =>
+      left.name.localeCompare(right.name),
     );
   }
 };
-export {
-  CLI
-};
+export { CLI };
 //# sourceMappingURL=index.js.map

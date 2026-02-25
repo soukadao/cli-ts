@@ -6,4 +6,7 @@ export declare const renderGlobalHelp: (context: HelpContext) => string;
 /**
  * Renders the command-specific help text.
  */
-export declare const renderCommandHelp: (context: HelpContext, command: CommandDefinition) => string;
+export declare const renderCommandHelp: (
+  context: HelpContext,
+  command: CommandDefinition,
+) => string;
