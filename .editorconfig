@@ -1,0 +1,36 @@
+# Supported Properties
+# - indent_style
+# - indent_size
+# - tab_width
+# - end_of_line
+# - charset
+# - trim_trailing_whitespace
+# - insert_final_newline
+# - root
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+[*.{yml,yaml}]
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.{json,jsonc}]
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.md]
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = false
+
+[*.{js,ts}]
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = true

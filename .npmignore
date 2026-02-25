@@ -1,0 +1,15 @@
+node_modules
+src
+**/*.test.ts
+coverage
+.DS_Store
+*.log
+.env
+.env.*
+.vscode
+.github
+AGENTS.md
+biome.json
+tsconfig.json
+vitest.config.ts
+pnpm-lock.yaml
