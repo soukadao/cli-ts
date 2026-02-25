@@ -2,9 +2,7 @@ import type { CommandDefinition, GlobalOptions } from "./types.js";
 /**
  * Ensures a command definition is valid before registration.
  */
-export declare const assertValidCommandDefinition: (
-  command: CommandDefinition,
-) => void;
+export declare const assertValidCommandDefinition: (command: CommandDefinition) => void;
 /**
  * Ensures global options remain safe and predictable.
  */

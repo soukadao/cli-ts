@@ -108,7 +108,7 @@ const buildCommandSuggestion = (
 };
 
 const buildHelpContext = (
-  cli: Cli,
+  cli: CLI,
   commands: CommandDefinition[],
 ): HelpContext => ({
   name: cli.name,
@@ -118,7 +118,7 @@ const buildHelpContext = (
   globalOptions: cli.options,
 });
 
-class Cli {
+class CLI {
   readonly name: string;
   readonly version: string;
   readonly description: string;
@@ -245,4 +245,4 @@ class Cli {
   }
 }
 
-export { Cli };
+export { CLI };

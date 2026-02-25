@@ -10,10 +10,10 @@ A small, safe, and modular CLI foundation.
 
 ## Usage
 ```ts
-import { Cli } from "./src/index.js";
+import { CLI } from "./src/index.js";
 import pkg from "../package.json" with { type: "json" }; 
 
-const cli = new Cli(pkg.name, pkg.version, pkg.description);
+const cli = new CLI(pkg.name, pkg.version, pkg.description);
 
 cli.command({
   name: "build",
@@ -56,7 +56,7 @@ cli.run();
 - Short flag bundles (e.g. `-vf`) are supported only for boolean options.
 
 ## API
-- `Cli`: registers commands and runs the CLI.
+- `CLI`: registers commands and runs the CLI.
 - `CommandDefinition`: defines name, description, options, args, and action.
 - `OptionDefinition`: defines option name, type, short flag, defaults, and choices.
 - `ArgumentDefinition`: defines positional arguments, including optional or variadic.

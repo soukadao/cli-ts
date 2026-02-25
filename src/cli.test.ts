@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Cli } from "./cli.js";
+import { CLI } from "./cli.js";
 import type { CommandContext, CommandDefinition } from "./types.js";
 
 const createIo = () => {
@@ -17,10 +17,10 @@ const createIo = () => {
   };
 };
 
-describe("Cli", () => {
+describe("CLI", () => {
   it("prints global help when no arguments are provided", async () => {
     const { io, stdout, stderr } = createIo();
-    const cli = new Cli("demo", "1.0.0", "Demo CLI");
+    const cli = new CLI("demo", "1.0.0", "Demo CLI");
 
     const exitCode = await cli.run([], io);
 
@@ -31,7 +31,7 @@ describe("Cli", () => {
 
   it("runs a command with parsed input", async () => {
     const { io, stdout, stderr } = createIo();
-    const cli = new Cli("demo", "1.0.0", "Demo CLI");
+    const cli = new CLI("demo", "1.0.0", "Demo CLI");
 
     let captured: CommandContext | null = null;
 
@@ -83,7 +83,7 @@ describe("Cli", () => {
 
   it("prints version when --version is provided", async () => {
     const { io, stdout, stderr } = createIo();
-    const cli = new Cli("demo", "2.0.0", "Demo CLI");
+    const cli = new CLI("demo", "2.0.0", "Demo CLI");
 
     const exitCode = await cli.run(["--version"], io);
 
@@ -94,7 +94,7 @@ describe("Cli", () => {
 
   it("reports unknown commands with suggestions", async () => {
     const { io, stdout, stderr } = createIo();
-    const cli = new Cli("demo", "1.0.0", "Demo CLI");
+    const cli = new CLI("demo", "1.0.0", "Demo CLI");
 
     cli.command({
       name: "build",
