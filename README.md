@@ -10,8 +10,8 @@ A small, safe, and modular CLI foundation.
 
 ## Usage
 ```ts
-import { CLI } from "./src/index.js";
-import pkg from "../package.json" with { type: "json" }; 
+import { CLI } from "cli-ts";
+import pkg from "../package.json" with { type: "json" };
 
 const cli = new CLI(pkg.name, pkg.version, pkg.description);
 
