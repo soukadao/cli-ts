@@ -46,7 +46,7 @@ cli.command({
   }
 });
 
-cli.run();
+await cli.runAndExit();
 ```
 
 ## Conventions
@@ -56,7 +56,7 @@ cli.run();
 - Short flag bundles (e.g. `-vf`) are supported only for boolean options.
 
 ## API
-- `CLI`: registers commands and runs the CLI.
+- `CLI`: registers commands and runs the CLI (`run`, `runAndExit`).
 - `CommandDefinition`: defines name, description, options, args, and action.
 - `OptionDefinition`: defines option name, type, short flag, defaults, and choices.
 - `ArgumentDefinition`: defines positional arguments, including optional or variadic.

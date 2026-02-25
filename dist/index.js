@@ -866,6 +866,13 @@ var CLI = class {
     }
   }
   /**
+   * Runs the CLI and exits the process with the resulting exit code.
+   */
+  async runAndExit(argv = process.argv.slice(ARGV_OFFSET), io = DEFAULT_IO) {
+    const exitCode = await this.run(argv, io);
+    process.exit(exitCode);
+  }
+  /**
    * Returns registered commands in name order.
    */
   listCommands() {

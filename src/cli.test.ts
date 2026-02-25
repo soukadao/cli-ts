@@ -245,4 +245,17 @@ describe("CLI", () => {
     expect(stdoutSpy).toHaveBeenCalled();
     expect(stderrSpy).not.toHaveBeenCalled();
   });
+
+  it("exits the process after running a command", async () => {
+    const { io, stderr } = createIo();
+    const cli = new CLI("demo", "1.0.0", "Demo CLI");
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined) as never);
+
+    await cli.runAndExit(["--version"], io);
+
+    expect(stderr).toHaveLength(0);
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_SUCCESS);
+  });
 });

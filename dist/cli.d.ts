@@ -18,6 +18,10 @@ declare class CLI {
      */
     run(argv?: string[], io?: CliIO): Promise<number>;
     /**
+     * Runs the CLI and exits the process with the resulting exit code.
+     */
+    runAndExit(argv?: string[], io?: CliIO): Promise<void>;
+    /**
      * Returns registered commands in name order.
      */
     private listCommands;
