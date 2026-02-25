@@ -1,0 +1,17 @@
+export declare const EXIT_SUCCESS = 0;
+export declare const EXIT_FAILURE = 1;
+export declare const ARGV_OFFSET = 2;
+export declare const EMPTY = 0;
+export declare const SINGLE_CHAR_LENGTH = 1;
+export declare const COLUMN_GAP = 2;
+export declare const INDENT = "  ";
+export declare const SHORT_PREFIX = "-";
+export declare const LONG_PREFIX = "--";
+export declare const OPTION_TERMINATOR = "--";
+export declare const EQUALS_SEPARATOR = "=";
+export declare const BOOLEAN_TRUE = "true";
+export declare const BOOLEAN_FALSE = "false";
+export declare const MAX_SUGGESTION_DISTANCE = 2;
+export declare const USAGE_COMMAND_PLACEHOLDER = "<command>";
+export declare const USAGE_OPTIONS_PLACEHOLDER = "[options]";
+export declare const SHORT_NAME_LENGTH = 1;
