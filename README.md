@@ -50,7 +50,7 @@ await cli.runAndExit();
 ```
 
 ## Conventions
-- Global flags: `-h, --help` and `-v, --version`.
+- Global flags: `-h, --help` (shows global or command help) and `-v, --version` (only honored before the command name).
 - Unknown options/commands are treated as errors.
 - Use `--` to stop option parsing when passing values that start with `-`.
 - Short flag bundles (e.g. `-vf`) are supported only for boolean options.

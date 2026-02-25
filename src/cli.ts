@@ -164,13 +164,17 @@ class CLI {
     const helpFlags = getOptionFlags(this.options.help);
     const versionFlags = getOptionFlags(this.options.version);
 
-    const helpRequested = argv.some((arg) => helpFlags.includes(arg));
-    const versionRequested = argv.some((arg) => versionFlags.includes(arg));
-
     const commandIndex = findCommandIndex(argv);
     const commandName = commandIndex >= EMPTY ? argv[commandIndex] : undefined;
     const commandArgs =
       commandIndex >= EMPTY ? argv.slice(commandIndex + 1) : [];
+    const globalArgs =
+      commandIndex >= EMPTY ? argv.slice(EMPTY, commandIndex) : argv;
+
+    const helpRequested = argv.some((arg) => helpFlags.includes(arg));
+    const versionRequested = globalArgs.some((arg) =>
+      versionFlags.includes(arg),
+    );
 
     const sortedCommands = this.listCommands();
     const helpContext = buildHelpContext(this, sortedCommands);

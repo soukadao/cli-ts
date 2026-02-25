@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CLI } from "./cli.js";
-import { EXIT_FAILURE, EXIT_SUCCESS } from "./constants.js";
+import { EMPTY, EXIT_FAILURE, EXIT_SUCCESS } from "./constants.js";
 import type { CommandContext, CommandDefinition } from "./types.js";
 
 const createIo = () => {
@@ -95,6 +95,24 @@ describe("CLI", () => {
     expect(exitCode).toBe(EXIT_SUCCESS);
     expect(stderr).toHaveLength(0);
     expect(stdout[0]).toBe("demo 2.0.0");
+  });
+
+  it("treats --version after a command as a command option", async () => {
+    const { io, stdout, stderr } = createIo();
+    const cli = new CLI("demo", "1.0.0", "Demo CLI");
+
+    cli.command({
+      name: "build",
+      description: "Build the project",
+      action: () => {},
+    });
+
+    const exitCode = await cli.run(["build", "--version"], io);
+
+    expect(exitCode).toBe(EXIT_FAILURE);
+    expect(stdout).toHaveLength(EMPTY);
+    expect(stderr[0]).toBe("Unknown option: --version.");
+    expect(stderr[1]).toBe("Run demo build --help for usage.");
   });
 
   it("reports unknown commands with suggestions", async () => {
