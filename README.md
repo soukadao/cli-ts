@@ -46,17 +46,18 @@ cli.command({
   }
 });
 
-await cli.runAndExit();
+await cli.run();
 ```
 
 ## Conventions
+- `run()` calls `process.exit` with the exit code after completion.
 - Global flags: `-h, --help` (shows global or command help) and `-v, --version` (only honored before the command name).
 - Unknown options/commands are treated as errors.
 - Use `--` to stop option parsing when passing values that start with `-`.
 - Short flag bundles (e.g. `-vf`) are supported only for boolean options.
 
 ## API
-- `CLI`: registers commands and runs the CLI (`run`, `runAndExit`).
+- `CLI`: registers commands and runs the CLI (`run`).
 - `CommandDefinition`: defines name, description, options, args, and action.
 - `OptionDefinition`: defines option name, type, short flag, defaults, and choices.
 - `ArgumentDefinition`: defines positional arguments, including optional or variadic.

@@ -179,27 +179,37 @@ class CLI {
     const sortedCommands = this.listCommands();
     const helpContext = buildHelpContext(this, sortedCommands);
 
+    let exitCode: number;
+
     if (helpRequested) {
       if (commandName) {
         const command = this.commands.get(commandName);
         if (command) {
           io.stdout(renderCommandHelp(helpContext, command));
-          return EXIT_SUCCESS;
+          exitCode = EXIT_SUCCESS;
+          process.exit(exitCode);
+          return exitCode;
         }
       }
 
       io.stdout(renderGlobalHelp(helpContext));
-      return EXIT_SUCCESS;
+      exitCode = EXIT_SUCCESS;
+      process.exit(exitCode);
+      return exitCode;
     }
 
     if (versionRequested) {
       io.stdout(`${this.name} ${this.version}`);
-      return EXIT_SUCCESS;
+      exitCode = EXIT_SUCCESS;
+      process.exit(exitCode);
+      return exitCode;
     }
 
     if (!commandName) {
       io.stdout(renderGlobalHelp(helpContext));
-      return EXIT_SUCCESS;
+      exitCode = EXIT_SUCCESS;
+      process.exit(exitCode);
+      return exitCode;
     }
 
     const command = this.commands.get(commandName);
@@ -209,7 +219,9 @@ class CLI {
         ? `Unknown command: ${commandName}. ${suggestion}`
         : `Unknown command: ${commandName}.`;
       io.stderr(message);
-      return EXIT_FAILURE;
+      exitCode = EXIT_FAILURE;
+      process.exit(exitCode);
+      return exitCode;
     }
 
     const parseResult = parseCommandInput(commandArgs, command);
@@ -221,7 +233,9 @@ class CLI {
       io.stderr(
         `Run ${this.name} ${command.name} ${buildLongFlag(this.options.help.name)} for usage.`,
       );
-      return EXIT_FAILURE;
+      exitCode = EXIT_FAILURE;
+      process.exit(exitCode);
+      return exitCode;
     }
 
     const context: CommandContext = {
@@ -232,22 +246,15 @@ class CLI {
 
     try {
       await command.action(context);
-      return EXIT_SUCCESS;
+      exitCode = EXIT_SUCCESS;
+      process.exit(exitCode);
+      return exitCode;
     } catch (error) {
       io.stderr(formatError(error));
-      return EXIT_FAILURE;
+      exitCode = EXIT_FAILURE;
+      process.exit(exitCode);
+      return exitCode;
     }
-  }
-
-  /**
-   * Runs the CLI and exits the process with the resulting exit code.
-   */
-  async runAndExit(
-    argv: string[] = process.argv.slice(ARGV_OFFSET),
-    io: CliIO = DEFAULT_IO,
-  ): Promise<void> {
-    const exitCode = await this.run(argv, io);
-    process.exit(exitCode);
   }
 
   /**

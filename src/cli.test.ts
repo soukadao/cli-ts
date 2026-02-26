@@ -1,7 +1,12 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CLI } from "./cli.js";
-import { EMPTY, EXIT_FAILURE, EXIT_SUCCESS } from "./constants.js";
+import {
+  EMPTY,
+  EXIT_FAILURE,
+  EXIT_SUCCESS,
+  SINGLE_CHAR_LENGTH,
+} from "./constants.js";
 import type { CommandContext, CommandDefinition } from "./types.js";
 
 const createIo = () => {
@@ -23,6 +28,14 @@ afterEach(() => {
 });
 
 describe("CLI", () => {
+  let exitSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined) as never);
+  });
+
   it("prints global help when no arguments are provided", async () => {
     const { io, stdout, stderr } = createIo();
     const cli = new CLI("demo", "1.0.0", "Demo CLI");
@@ -30,8 +43,9 @@ describe("CLI", () => {
     const exitCode = await cli.run([], io);
 
     expect(exitCode).toBe(EXIT_SUCCESS);
-    expect(stderr).toHaveLength(0);
-    expect(stdout[0]).toContain("Usage: demo <command>");
+    expect(stderr).toHaveLength(EMPTY);
+    expect(stdout[EMPTY]).toContain("Usage: demo <command>");
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_SUCCESS);
   });
 
   it("runs a command with parsed input", async () => {
@@ -79,11 +93,12 @@ describe("CLI", () => {
     );
 
     expect(exitCode).toBe(EXIT_SUCCESS);
-    expect(stderr).toHaveLength(0);
-    expect(stdout).toHaveLength(0);
+    expect(stderr).toHaveLength(EMPTY);
+    expect(stdout).toHaveLength(EMPTY);
     expect(captured).not.toBeNull();
     expect(captured?.options).toEqual({ output: "dist", force: true });
     expect(captured?.args).toEqual({ entry: "entry.ts" });
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_SUCCESS);
   });
 
   it("prints version when --version is provided", async () => {
@@ -93,8 +108,9 @@ describe("CLI", () => {
     const exitCode = await cli.run(["--version"], io);
 
     expect(exitCode).toBe(EXIT_SUCCESS);
-    expect(stderr).toHaveLength(0);
-    expect(stdout[0]).toBe("demo 2.0.0");
+    expect(stderr).toHaveLength(EMPTY);
+    expect(stdout[EMPTY]).toBe("demo 2.0.0");
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_SUCCESS);
   });
 
   it("treats --version after a command as a command option", async () => {
@@ -111,8 +127,11 @@ describe("CLI", () => {
 
     expect(exitCode).toBe(EXIT_FAILURE);
     expect(stdout).toHaveLength(EMPTY);
-    expect(stderr[0]).toBe("Unknown option: --version.");
-    expect(stderr[1]).toBe("Run demo build --help for usage.");
+    expect(stderr[EMPTY]).toBe("Unknown option: --version.");
+    expect(stderr[EMPTY + SINGLE_CHAR_LENGTH]).toBe(
+      "Run demo build --help for usage.",
+    );
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_FAILURE);
   });
 
   it("reports unknown commands with suggestions", async () => {
@@ -128,8 +147,9 @@ describe("CLI", () => {
     const exitCode = await cli.run(["buid"], io);
 
     expect(exitCode).toBe(EXIT_FAILURE);
-    expect(stdout).toHaveLength(0);
-    expect(stderr[0]).toContain("Did you mean build?");
+    expect(stdout).toHaveLength(EMPTY);
+    expect(stderr[EMPTY]).toContain("Did you mean build?");
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_FAILURE);
   });
 
   it("prints command help when --help is used with a command", async () => {
@@ -145,9 +165,10 @@ describe("CLI", () => {
     const exitCode = await cli.run(["build", "--help"], io);
 
     expect(exitCode).toBe(EXIT_SUCCESS);
-    expect(stderr).toHaveLength(0);
-    expect(stdout[0]).toContain("Usage: demo build [options]");
-    expect(stdout[0]).toContain("Arguments:");
+    expect(stderr).toHaveLength(EMPTY);
+    expect(stdout[EMPTY]).toContain("Usage: demo build [options]");
+    expect(stdout[EMPTY]).toContain("Arguments:");
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_SUCCESS);
   });
 
   it("prints global help when --help is used with an unknown command", async () => {
@@ -157,9 +178,10 @@ describe("CLI", () => {
     const exitCode = await cli.run(["unknown", "--help"], io);
 
     expect(exitCode).toBe(EXIT_SUCCESS);
-    expect(stderr).toHaveLength(0);
-    expect(stdout[0]).toContain("Usage: demo <command> [options]");
-    expect(stdout[0]).toContain("Commands:");
+    expect(stderr).toHaveLength(EMPTY);
+    expect(stdout[EMPTY]).toContain("Usage: demo <command> [options]");
+    expect(stdout[EMPTY]).toContain("Commands:");
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_SUCCESS);
   });
 
   it("reports unknown commands without suggestions when distance is too large", async () => {
@@ -175,8 +197,9 @@ describe("CLI", () => {
     const exitCode = await cli.run(["xyz"], io);
 
     expect(exitCode).toBe(EXIT_FAILURE);
-    expect(stdout).toHaveLength(0);
-    expect(stderr[0]).toBe("Unknown command: xyz.");
+    expect(stdout).toHaveLength(EMPTY);
+    expect(stderr[EMPTY]).toBe("Unknown command: xyz.");
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_FAILURE);
   });
 
   it("reports parse errors with a usage hint", async () => {
@@ -208,10 +231,13 @@ describe("CLI", () => {
     const exitCode = await cli.run(["build"], io);
 
     expect(exitCode).toBe(EXIT_FAILURE);
-    expect(stdout).toHaveLength(0);
-    expect(stderr[0]).toContain("Missing required option: --output");
-    expect(stderr[0]).toContain("Missing required argument: entry");
-    expect(stderr[1]).toBe("Run demo build --help for usage.");
+    expect(stdout).toHaveLength(EMPTY);
+    expect(stderr[EMPTY]).toContain("Missing required option: --output");
+    expect(stderr[EMPTY]).toContain("Missing required argument: entry");
+    expect(stderr[EMPTY + SINGLE_CHAR_LENGTH]).toBe(
+      "Run demo build --help for usage.",
+    );
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_FAILURE);
   });
 
   it("formats non-Error throwables", async () => {
@@ -229,8 +255,9 @@ describe("CLI", () => {
     const exitCode = await cli.run(["boom"], io);
 
     expect(exitCode).toBe(EXIT_FAILURE);
-    expect(stdout).toHaveLength(0);
-    expect(stderr[0]).toBe("boom");
+    expect(stdout).toHaveLength(EMPTY);
+    expect(stderr[EMPTY]).toBe("boom");
+    expect(exitSpy).toHaveBeenCalledWith(EXIT_FAILURE);
   });
 
   it("prevents duplicate command registration", () => {
@@ -262,18 +289,6 @@ describe("CLI", () => {
     expect(exitCode).toBe(EXIT_SUCCESS);
     expect(stdoutSpy).toHaveBeenCalled();
     expect(stderrSpy).not.toHaveBeenCalled();
-  });
-
-  it("exits the process after running a command", async () => {
-    const { io, stderr } = createIo();
-    const cli = new CLI("demo", "1.0.0", "Demo CLI");
-    const exitSpy = vi
-      .spyOn(process, "exit")
-      .mockImplementation((() => undefined) as never);
-
-    await cli.runAndExit(["--version"], io);
-
-    expect(stderr).toHaveLength(0);
     expect(exitSpy).toHaveBeenCalledWith(EXIT_SUCCESS);
   });
 });
